@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Add Listing – FoodBridge AI{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card">
+    <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+    <h1 class="page-title">Add Food Listing</h1>
+    <p class="page-sub">Share surplus food and help someone in need</p>
+    <form method="POST" class="auth-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Food Title *</label>
+          <input type="text" name="title" required placeholder="e.g. Fresh Biryani, Bread Loaves"/>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category">
+            <option>Cooked Food</option>
+            <option>Produce</option>
+            <option>Bakery</option>
+            <option>Packaged</option>
+            <option>Dairy</option>
+            <option>Meat & Fish</option>
+            <option>Desserts</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" rows="3" placeholder="Brief description of the food (optional)"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Quantity *</label>
+          <input type="text" name="quantity" required placeholder="e.g. 10 portions, 5 kg, 20 packets"/>
+        </div>
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" name="expiry_date"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Pickup Location *</label>
+        <input type="text" name="location" required placeholder="e.g. Banjara Hills, Hyderabad" id="loc-input"/>
+        <input type="hidden" name="lat" id="lat-val"/>
+        <input type="hidden" name="lng" id="lng-val"/>
+        <button type="button" class="btn-locate" onclick="getLocation()">📍 Use My GPS Location</button>
+        <small id="loc-status"></small>
+      </div>
+      <div class="form-group">
+        <label>Image URL (optional)</label>
+        <input type="url" name="image_url" placeholder="https://example.com/food.jpg"/>
+      </div>
+      <div class="form-actions">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary">🌱 Publish Listing</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function getLocation(){
+  const s=document.getElementById('loc-status');
+  s.textContent='Detecting…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById('lat-val').value=pos.coords.latitude.toFixed(6);
+    document.getElementById('lng-val').value=pos.coords.longitude.toFixed(6);
+    s.textContent='✅ GPS location captured';
+    s.style.color='#16a34a';
+  }, ()=>{ s.textContent='⚠️ Location not captured. Enter address manually.'; s.style.color='#d97706'; });
+}
+// Set min date to today
+document.querySelector('input[type=date]').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

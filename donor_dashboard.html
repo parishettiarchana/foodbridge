@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+{% block title %}Donor Dashboard - FoodBridge AI{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <span class="eyebrow">Donor operations</span>
+  <h1>Donor Dashboard</h1>
+  <p>Donate food, click food photos, monitor pickup readiness, and coordinate handoffs with NGOs and delivery volunteers.</p>
+  <div class="hero-actions">
+    <a class="btn primary" href="{{ url_for('donate_food') }}">Donate food</a>
+    <a class="btn secondary" href="{{ url_for('volunteer') }}">Find volunteers</a>
+  </div>
+</section>
+
+<section class="dashboard-grid">
+  <div class="panel wide">
+    <div class="panel-header">
+      <h2>Food donations</h2>
+      <a class="icon-btn" href="{{ url_for('donate_food') }}" title="Donate food">+</a>
+    </div>
+    <div class="table">
+      {% for item in listings %}
+      <div class="table-row donation-row">
+        {% if item.image_data %}
+        <img class="listing-thumb" src="{{ item.image_data }}" alt="{{ item.name }}">
+        {% endif %}
+        <div>
+          <strong>{{ item.name }}</strong>
+          <span>{{ item.location }} - expires {{ item.expires }}</span>
+        </div>
+        <span class="tag">{{ item.quantity }}</span>
+        <span class="status">{{ item.status }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <aside class="panel">
+    <div class="panel-header">
+      <h2>AI queue</h2>
+    </div>
+    <div class="task-list">
+      {% for title, copy, action in tasks %}
+      <article class="task-card">
+        <h3>{{ title }}</h3>
+        <p>{{ copy }}</p>
+        <a class="text-btn" href="{{ url_for('donate_food') }}">{{ action }}</a>
+      </article>
+      {% endfor %}
+    </div>
+  </aside>
+</section>
+
+<section class="panel section-panel">
+  <div class="panel-header">
+    <h2>Delivery coordination</h2>
+    <a class="text-btn" href="{{ url_for('volunteer') }}">Volunteer signup</a>
+  </div>
+  <div class="table">
+    {% for delivery in deliveries %}
+    <div class="table-row delivery-row">
+      <div>
+        <strong>{{ delivery.food }}</strong>
+        <span>{{ delivery.donor }} to {{ delivery.receiver }}</span>
+      </div>
+      <span class="tag">{{ delivery.volunteer }}</span>
+      <span class="status">{{ delivery.status }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="panel section-panel">
+  <div class="panel-header">
+    <h2>Receiver feedback and complaints</h2>
+    <a class="text-btn" href="{{ url_for('feedback') }}">View all</a>
+  </div>
+  <div class="table">
+    {% for item in feedback %}
+    <div class="table-row feedback-row">
+      <div>
+        <strong>{{ item.type }} from {{ item.receiver }}</strong>
+        <span>{{ item.food }} - Rating {{ item.rating }}/5</span>
+      </div>
+      <span>{{ item.message }}</span>
+      <span class="status">{{ item.status }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

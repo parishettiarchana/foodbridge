@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Register – FoodBridge AI{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo">🌱</div>
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-sub">Join FoodBridge AI and make a difference</p>
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    <form method="POST" class="auth-form">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" name="name" required placeholder="Your full name"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="your@email.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required placeholder="Min 6 characters"/>
+      </div>
+      <div class="form-group">
+        <label>I want to</label>
+        <select name="role" required>
+          <option value="">-- Select Role --</option>
+          <option value="donor">🍱 Donate Food (Donor)</option>
+          <option value="receiver">🙏 Receive Food (Receiver)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Location / Area</label>
+        <input type="text" name="location" placeholder="e.g. Banjara Hills, Hyderabad" id="loc-input"/>
+        <input type="hidden" name="lat" id="lat-val"/>
+        <input type="hidden" name="lng" id="lng-val"/>
+        <button type="button" class="btn-locate" onclick="getLocation()">📍 Use My Location</button>
+        <small id="loc-status"></small>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+  </div>
+</div>
+<script>
+function getLocation(){
+  const s=document.getElementById('loc-status');
+  s.textContent='Detecting…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    document.getElementById('lat-val').value=pos.coords.latitude;
+    document.getElementById('lng-val').value=pos.coords.longitude;
+    s.textContent='✅ Location captured';
+  }, ()=>{ s.textContent='⚠️ Could not get location. Enter manually.'; });
+}
+</script>
+{% endblock %}

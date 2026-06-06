@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block title %}Donate Food - FoodBridge AI{% endblock %}
+{% block content %}
+<section class="page-heading compact">
+  <span class="eyebrow">New donation</span>
+  <h1>Donate food</h1>
+  <p>Add the food details, pickup address, quantity, and expiry window so receivers and volunteers can act quickly.</p>
+</section>
+
+{% if message %}
+<div class="notice">{{ message }}</div>
+{% endif %}
+
+<section class="form-layout">
+  <form class="panel app-form" method="post">
+    <div class="form-grid">
+      <label>
+        Food name
+        <input name="food_name" placeholder="Fresh meals, bread packs, fruit crates" required>
+      </label>
+      <label>
+        Category
+        <select name="category" required>
+          <option>Cooked</option>
+          <option>Bakery</option>
+          <option>Produce</option>
+          <option>Packaged</option>
+          <option>Dairy</option>
+        </select>
+      </label>
+      <label>
+        Quantity
+        <input name="quantity" placeholder="40 meals or 20 kg" required>
+      </label>
+      <label>
+        Expiry / safe until
+        <input name="expires" placeholder="Today, 9 PM" required>
+      </label>
+      <label>
+        Donor name
+        <input name="donor_name" placeholder="Your name" required>
+      </label>
+      <label>
+        Organization
+        <input name="organization" placeholder="Restaurant, event, store, home kitchen" required>
+      </label>
+      <label>
+        Phone
+        <input name="phone" placeholder="+91 ..." required>
+      </label>
+      <label>
+        Area
+        <input name="location" placeholder="Banjara Hills" required>
+      </label>
+      <label class="full-field">
+        Pickup address
+        <input name="address" placeholder="Full address for volunteer pickup" required>
+      </label>
+      <div class="camera-field full-field">
+        <div class="camera-head">
+          <strong>Click a photo of your food</strong>
+          <span>Use the phone camera so receivers can see the exact donation.</span>
+        </div>
+        <video class="camera-view" data-camera-video autoplay playsinline muted></video>
+        <canvas class="camera-canvas" data-camera-canvas hidden></canvas>
+        <input type="hidden" name="captured_photo" data-captured-photo>
+        <div class="camera-actions">
+          <button class="btn secondary" type="button" data-start-camera>Start camera</button>
+          <button class="btn primary" type="button" data-capture-photo disabled>Capture photo</button>
+        </div>
+        <div class="photo-preview" data-photo-preview>
+          <span>Captured food photo preview will appear here.</span>
+        </div>
+      </div>
+      <label class="full-field">
+        Handling notes
+        <textarea name="notes" rows="4" placeholder="Packaging, vegetarian/non-vegetarian, storage, pickup instructions"></textarea>
+      </label>
+    </div>
+    <button class="btn primary" type="submit">Donate food</button>
+  </form>
+  <aside class="panel guidance-panel">
+    <h2>Donation checklist</h2>
+    <ul>
+      <li>Food is packed and safe for transport.</li>
+      <li>Expiry or best-before time is clearly mentioned.</li>
+      <li>Pickup address and phone number are reachable.</li>
+      <li>Special handling notes are added for volunteers.</li>
+    </ul>
+  </aside>
+</section>
+{% endblock %}

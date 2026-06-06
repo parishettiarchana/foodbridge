@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+{% block title %}Feedback and Complaints - FoodBridge AI{% endblock %}
+{% block content %}
+<section class="page-heading compact">
+  <span class="eyebrow">Receiver support</span>
+  <h1>Feedback and complaints</h1>
+  <p>Receivers can report food quality, packaging, delivery timing, or share positive feedback after receiving donations.</p>
+</section>
+
+{% if message %}
+<div class="notice">{{ message }}</div>
+{% endif %}
+
+<section class="form-layout">
+  <form class="panel app-form" method="post">
+    <div class="form-grid">
+      <label>
+        Receiver / NGO name
+        <input name="receiver_name" placeholder="Community Kitchen Trust" required>
+      </label>
+      <label>
+        Food received
+        <select name="food_name" required>
+          {% for item in listings %}
+          <option>{{ item.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Type
+        <select name="feedback_type" required>
+          <option>Feedback</option>
+          <option>Complaint</option>
+          <option>Quality issue</option>
+          <option>Delivery issue</option>
+        </select>
+      </label>
+      <label>
+        Rating
+        <select name="rating" required>
+          <option>5</option>
+          <option>4</option>
+          <option>3</option>
+          <option>2</option>
+          <option>1</option>
+        </select>
+      </label>
+      <label class="full-field">
+        Message
+        <textarea name="message" rows="5" placeholder="Tell the donor what happened, what was good, or what needs fixing." required></textarea>
+      </label>
+    </div>
+    <button class="btn primary" type="submit">Submit feedback</button>
+  </form>
+
+  <aside class="panel guidance-panel">
+    <h2>What receivers can report</h2>
+    <ul>
+      <li>Food quality and freshness.</li>
+      <li>Packaging and quantity mismatch.</li>
+      <li>Late or missed delivery handoff.</li>
+      <li>Positive feedback for trusted donors.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="panel section-panel">
+  <div class="panel-header">
+    <h2>Recent receiver reports</h2>
+  </div>
+  <div class="table">
+    {% for item in feedback %}
+    <div class="table-row feedback-row">
+      <div>
+        <strong>{{ item.type }} from {{ item.receiver }}</strong>
+        <span>{{ item.food }} - Rating {{ item.rating }}/5</span>
+      </div>
+      <span>{{ item.message }}</span>
+      <span class="status">{{ item.status }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

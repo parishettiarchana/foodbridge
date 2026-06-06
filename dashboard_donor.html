@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Donor Dashboard – FoodBridge AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Donor Dashboard</h1>
+    <p class="page-sub">Manage your food listings and track requests</p>
+  </div>
+  <a href="{{ url_for('new_listing') }}" class="btn btn-primary">+ Add New Listing</a>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card stat-blue">
+    <div class="stat-icon">📋</div>
+    <div class="stat-val">{{ stats.total }}</div>
+    <div class="stat-label">Total Listings</div>
+  </div>
+  <div class="stat-card stat-green">
+    <div class="stat-icon">✅</div>
+    <div class="stat-val">{{ stats.available }}</div>
+    <div class="stat-label">Available</div>
+  </div>
+  <div class="stat-card stat-orange">
+    <div class="stat-icon">🤝</div>
+    <div class="stat-val">{{ stats.claimed }}</div>
+    <div class="stat-label">Claimed</div>
+  </div>
+  <div class="stat-card stat-purple">
+    <div class="stat-icon">📬</div>
+    <div class="stat-val">{{ stats.requests }}</div>
+    <div class="stat-label">Total Requests</div>
+  </div>
+</div>
+
+<!-- My Listings -->
+<section class="section">
+  <h2 class="section-title">My Food Listings</h2>
+  {% if listings %}
+  <div class="card-grid">
+    {% for l in listings %}
+    <div class="food-card {% if l.status == 'available' %}card-available{% elif l.status == 'claimed' %}card-claimed{% endif %}">
+      <div class="card-img-wrap">
+        {% if l.image_url %}
+          <img src="{{ l.image_url }}" alt="{{ l.title }}" class="card-img"/>
+        {% else %}
+          <div class="card-img-placeholder">{{ l.category[0] if l.category else '🍱' }}</div>
+        {% endif %}
+        <span class="card-status-badge {{ l.status }}">{{ l.status }}</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">{{ l.title }}</h3>
+        <p class="card-desc">{{ l.description or 'No description' }}</p>
+        <div class="card-meta">
+          <span>📦 {{ l.quantity }}</span>
+          <span>🏷️ {{ l.category or 'General' }}</span>
+        </div>
+        {% if l.expiry_date %}
+        <div class="card-expiry">⏰ Expires: {{ l.expiry_date }}</div>
+        {% endif %}
+        {% if l.location %}
+        <div class="card-location">📍 {{ l.location }}</div>
+        {% endif %}
+        <div class="card-actions">
+          <form method="POST" action="{{ url_for('update_status', lid=l.id) }}" style="display:inline">
+            {% if l.status == 'available' %}
+            <input type="hidden" name="status" value="claimed"/>
+            <button type="submit" class="btn btn-sm btn-outline">Mark Claimed</button>
+            {% else %}
+            <input type="hidden" name="status" value="available"/>
+            <button type="submit" class="btn btn-sm btn-outline">Mark Available</button>
+            {% endif %}
+          </form>
+          <form method="POST" action="{{ url_for('delete_listing', lid=l.id) }}" style="display:inline"
+                onsubmit="return confirm('Delete this listing?')">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🍱</div>
+    <p>No listings yet. <a href="{{ url_for('new_listing') }}">Add your first listing!</a></p>
+  </div>
+  {% endif %}
+</section>
+
+<!-- Incoming Requests -->
+<section class="section">
+  <h2 class="section-title">Incoming Requests</h2>
+  {% if requests %}
+  <div class="requests-table-wrap">
+    <table class="requests-table">
+      <thead>
+        <tr><th>Food Item</th><th>Requested By</th><th>Message</th><th>Status</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for r in requests %}
+        <tr>
+          <td><strong>{{ r.title }}</strong></td>
+          <td>{{ r.receiver_name }}</td>
+          <td>{{ r.message or '—' }}</td>
+          <td><span class="req-status {{ r.status }}">{{ r.status }}</span></td>
+          <td>
+            {% if r.status == 'pending' %}
+            <form method="POST" action="{{ url_for('approve_request', rid=r.id) }}">
+              <button type="submit" class="btn btn-sm btn-primary">Approve</button>
+            </form>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">📬</div><p>No requests yet.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

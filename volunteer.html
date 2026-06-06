@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+{% block title %}Volunteer Delivery - FoodBridge AI{% endblock %}
+{% block content %}
+<section class="page-heading compact">
+  <span class="eyebrow">Delivery volunteers</span>
+  <h1>Volunteer delivery</h1>
+  <p>Register to move donated food from donors to receivers, see food availability alerts, and accept open delivery handoffs.</p>
+</section>
+
+{% if message %}
+<div class="notice">{{ message }}</div>
+{% endif %}
+
+{% if alerts %}
+<section class="alert-grid" aria-label="Volunteer delivery alerts">
+  {% for alert in alerts %}
+  <article class="notice alert-card">
+    <strong>{{ alert.title }}</strong>
+    <span>{{ alert.message }}</span>
+    <small>{{ alert.status }}</small>
+  </article>
+  {% endfor %}
+</section>
+{% endif %}
+
+<section class="form-layout">
+  <form class="panel app-form" method="post">
+    <div class="form-grid">
+      <label>
+        Full name
+        <input name="name" placeholder="Volunteer name" required>
+      </label>
+      <label>
+        Phone
+        <input name="phone" placeholder="+91 ..." required>
+      </label>
+      <label>
+        Service area
+        <input name="area" placeholder="Madhapur, Jubilee Hills, Secunderabad" required>
+      </label>
+      <label>
+        Vehicle
+        <select name="vehicle" required>
+          <option>Two-wheeler</option>
+          <option>Car</option>
+          <option>Van</option>
+          <option>On foot</option>
+        </select>
+      </label>
+      <label class="full-field">
+        Availability
+        <input name="availability" placeholder="Today 6 PM - 9 PM, weekends, mornings" required>
+      </label>
+    </div>
+    <button class="btn primary" type="submit">Sign up as volunteer</button>
+  </form>
+
+  <aside class="panel">
+    <div class="panel-header">
+      <h2>Available volunteers</h2>
+    </div>
+    <div class="task-list">
+      {% for volunteer in volunteers %}
+      <article class="task-card">
+        <h3>{{ volunteer.name }}</h3>
+        <p>{{ volunteer.area }} - {{ volunteer.vehicle }}</p>
+        <span class="status">{{ volunteer.status }}</span>
+      </article>
+      {% endfor %}
+    </div>
+  </aside>
+</section>
+
+<section class="panel section-panel">
+  <div class="panel-header">
+    <h2>Open delivery queue</h2>
+    <a class="text-btn" href="{{ url_for('marketplace') }}">View food requests</a>
+  </div>
+  <div class="table">
+    {% for delivery in deliveries %}
+    <div class="table-row delivery-row">
+      <div>
+        <strong>{{ delivery.food }}</strong>
+        <span>{{ delivery.donor }} to {{ delivery.receiver }}</span>
+      </div>
+      <span class="tag">{{ delivery.volunteer }}</span>
+      {% if delivery.volunteer == "Needs volunteer" %}
+      <form class="assign-form" action="{{ url_for('assign_delivery', delivery_index=loop.index0) }}" method="post">
+        <input name="volunteer_name" placeholder="Your name" required>
+        <button class="text-btn" type="submit">Accept</button>
+      </form>
+      {% else %}
+      <span class="status">{{ delivery.status }}</span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="panel section-panel">
+  <div class="panel-header">
+    <h2>Volunteer delivery maps</h2>
+    <span class="tag">Pickup to receiver</span>
+  </div>
+  <div class="map-grid">
+    {% for delivery in deliveries %}
+    <article class="map-delivery-card">
+      <div>
+        <h3>{{ delivery.food }}</h3>
+        <p><strong>Pickup:</strong> {{ delivery.pickup }}</p>
+        <p><strong>Deliver to:</strong> {{ delivery.dropoff }}</p>
+      </div>
+      <iframe
+        title="Delivery map for {{ delivery.food }}"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        src="https://maps.google.com/maps?q={{ delivery.dropoff|urlencode }}&output=embed">
+      </iframe>
+      <a class="btn secondary full" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin={{ delivery.pickup|urlencode }}&destination={{ delivery.dropoff|urlencode }}">
+        Open route map
+      </a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block title %}FoodBridge AI - Functional food donation platform{% endblock %}
+{% block content %}
+<section class="hero-section">
+  <div class="hero-copy">
+    <div class="brand-intro" aria-label="FoodBridge AI">
+      <span class="brand-intro-mark">FB</span>
+      <span>FoodBridge AI</span>
+    </div>
+    <span class="eyebrow">AI powered surplus food network</span>
+    <h1>FoodBridge AI</h1>
+    <p>A functional food donation platform for donors, receivers, and delivery volunteers.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="{{ url_for('donate_food') }}">Donate food</a>
+      <a class="btn secondary" href="{{ url_for('marketplace') }}">Browse food</a>
+      <a class="btn tertiary" href="{{ url_for('volunteer') }}">Volunteer delivery</a>
+    </div>
+    {% if alerts %}
+    <div class="inline-alert">
+      <strong>{{ alerts|length }} delivery alert available</strong>
+      <span>Volunteers can pick up open food donations now.</span>
+    </div>
+    {% endif %}
+  </div>
+  <div class="hero-panel" aria-label="Live rescue summary">
+    <div class="map-card">
+      <div class="pulse-dot one"></div>
+      <div class="pulse-dot two"></div>
+      <div class="pulse-dot three"></div>
+      <div class="route-line"></div>
+      <div class="map-info">
+        <strong>FoodBridge AI live match</strong>
+        <span>Green Leaf Caterers to Community Kitchen Trust</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-grid" aria-label="Impact metrics">
+  {% for value, label, note in stats %}
+  <article class="stat-card">
+    <strong>{{ value }}</strong>
+    <span>{{ label }}</span>
+    <small>{{ note }}</small>
+  </article>
+  {% endfor %}
+</section>
+
+<section class="split-section">
+  <div>
+    <span class="eyebrow">Marketplace preview</span>
+    <h2>High quality food, routed with urgency.</h2>
+    <p class="muted">Every listing carries quantity, expiry, location, clicked photo proof, and a match score so teams can act quickly.</p>
+  </div>
+  <div class="listing-stack">
+    {% for item in listings %}
+    <article class="listing-card">
+      {% if item.image_data %}
+      <img class="listing-thumb" src="{{ item.image_data }}" alt="{{ item.name }}">
+      {% endif %}
+      <div>
+        <span class="tag">{{ item.category }}</span>
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.source }} - {{ item.location }}</p>
+      </div>
+      <div class="listing-meta">
+        <strong>{{ item.quantity }}</strong>
+        <span>{{ item.match }}% match</span>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

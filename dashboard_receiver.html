@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Receiver Dashboard – FoodBridge AI{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Available Food Near You</h1>
+    <p class="page-sub">Browse and request food donations sorted by distance</p>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+  <div class="stat-card stat-blue">
+    <div class="stat-icon">🍱</div>
+    <div class="stat-val">{{ stats.available }}</div>
+    <div class="stat-label">Available Listings</div>
+  </div>
+  <div class="stat-card stat-green">
+    <div class="stat-icon">📬</div>
+    <div class="stat-val">{{ stats.my_requests }}</div>
+    <div class="stat-label">My Requests</div>
+  </div>
+  <div class="stat-card stat-orange">
+    <div class="stat-icon">✅</div>
+    <div class="stat-val">{{ stats.approved }}</div>
+    <div class="stat-label">Approved</div>
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+  <input type="text" id="search-input" placeholder="🔍 Search food listings..." oninput="filterCards()"/>
+  <select id="cat-filter" onchange="filterCards()">
+    <option value="">All Categories</option>
+    <option>Cooked Food</option>
+    <option>Produce</option>
+    <option>Bakery</option>
+    <option>Packaged</option>
+    <option>Dairy</option>
+  </select>
+</div>
+
+<!-- Listings Grid -->
+<section class="section">
+  <h2 class="section-title">Food Listings</h2>
+  {% if listings %}
+  <div class="card-grid" id="listings-grid">
+    {% for l in listings %}
+    <div class="food-card card-available" data-title="{{ l.title|lower }}" data-cat="{{ l.category|lower }}">
+      <div class="card-img-wrap">
+        {% if l.image_url %}
+          <img src="{{ l.image_url }}" alt="{{ l.title }}" class="card-img"/>
+        {% else %}
+          <div class="card-img-placeholder">
+            {% if l.category == 'Cooked Food' %}🍛
+            {% elif l.category == 'Produce' %}🥦
+            {% elif l.category == 'Bakery' %}🍞
+            {% elif l.category == 'Packaged' %}📦
+            {% else %}🍱{% endif %}
+          </div>
+        {% endif %}
+        {% if l.distance %}
+        <span class="distance-badge">📍 {{ l.distance }} km</span>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">{{ l.title }}</h3>
+        <p class="card-desc">{{ l.description or 'No description provided' }}</p>
+        <div class="card-meta">
+          <span>📦 {{ l.quantity }}</span>
+          <span>🏷️ {{ l.category or 'General' }}</span>
+        </div>
+        {% if l.expiry_date %}
+        <div class="card-expiry">⏰ Expires: {{ l.expiry_date }}</div>
+        {% endif %}
+        <div class="card-location">📍 {{ l.location }} · By {{ l.donor_name }}</div>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-primary" onclick="openRequestModal({{ l.id }}, '{{ l.title }}')">
+            🙏 Request This
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">🍱</div>
+    <p>No food available near you right now. Check back soon!</p>
+  </div>
+  {% endif %}
+</section>
+
+<!-- My Requests -->
+<section class="section">
+  <h2 class="section-title">My Requests</h2>
+  {% if my_requests %}
+  <div class="requests-table-wrap">
+    <table class="requests-table">
+      <thead>
+        <tr><th>Food Item</th><th>Donor</th><th>Message</th><th>Status</th><th>Date</th></tr>
+      </thead>
+      <tbody>
+        {% for r in my_requests %}
+        <tr>
+          <td><strong>{{ r.title }}</strong></td>
+          <td>{{ r.donor_name }}</td>
+          <td>{{ r.message or '—' }}</td>
+          <td><span class="req-status {{ r.status }}">{{ r.status }}</span></td>
+          <td>{{ r.created_at[:10] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">📬</div><p>You haven't requested any food yet.</p></div>
+  {% endif %}
+</section>
+
+<!-- Request Modal -->
+<div id="req-modal" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal()"></div>
+  <div class="modal-box">
+    <h2 class="modal-title">Request Food</h2>
+    <p id="modal-food-name" class="modal-subtitle"></p>
+    <form method="POST" id="req-form">
+      <div class="form-group">
+        <label>Message to Donor (optional)</label>
+        <textarea name="message" rows="3" placeholder="Briefly explain your need…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" onclick="closeModal()" class="btn btn-outline">Cancel</button>
+        <button type="submit" class="btn btn-primary">Send Request</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openRequestModal(id, title){
+  document.getElementById('modal-food-name').textContent = '🍱 ' + title;
+  document.getElementById('req-form').action = '/request/' + id;
+  document.getElementById('req-modal').classList.remove('hidden');
+}
+function closeModal(){
+  document.getElementById('req-modal').classList.add('hidden');
+}
+function filterCards(){
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const cat = document.getElementById('cat-filter').value.toLowerCase();
+  document.querySelectorAll('#listings-grid .food-card').forEach(card=>{
+    const matchQ = !q || card.dataset.title.includes(q);
+    const matchC = !cat || card.dataset.cat === cat;
+    card.style.display = (matchQ && matchC) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

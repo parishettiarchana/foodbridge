@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}FoodBridge AI{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+{% if session.user_id %}
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="brand-icon">🌱</span>
+    <span class="brand-text">FoodBridge <span class="brand-ai">AI</span></span>
+  </div>
+  <div class="nav-links">
+    <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+    {% if session.user_role == 'donor' %}
+    <a href="{{ url_for('new_listing') }}" class="nav-link nav-cta">+ Add Listing</a>
+    {% endif %}
+    <div class="nav-user">
+      <span class="role-badge {{ session.user_role }}">{{ session.user_role }}</span>
+      <span class="user-name">{{ session.user_name }}</span>
+      <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+  </div>
+</nav>
+{% endif %}
+<main class="main-content">
+  {% block content %}{% endblock %}
+</main>
+{% if session.user_id %}
+<!-- Chatbot -->
+<div id="chatbot-bubble" onclick="toggleChat()">💬</div>
+<div id="chatbot-panel" class="chatbot-panel hidden">
+  <div class="chatbot-header">
+    <div class="chatbot-title"><span>🤖</span> FoodBridge AI Assistant</div>
+    <button onclick="toggleChat()" class="chatbot-close">✕</button>
+  </div>
+  <div id="chatbot-messages" class="chatbot-messages">
+    <div class="chat-msg bot">
+      <div class="chat-bubble">👋 Hi! I'm your FoodBridge AI assistant. How can I help you today?<br><br>
+        <small>Try: "How to list food", "Help", "How does it work"</small>
+      </div>
+    </div>
+  </div>
+  <div class="chatbot-input-row">
+    <input id="chatbot-input" type="text" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button onclick="sendChat()" class="chat-send-btn">➤</button>
+  </div>
+</div>
+{% endif %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block title %}Marketplace - FoodBridge AI{% endblock %}
+{% block content %}
+<section class="page-heading compact">
+  <span class="eyebrow">Available now</span>
+  <h1>Marketplace</h1>
+  <p>Browse verified surplus food by match score, location, quantity, and pickup urgency.</p>
+</section>
+
+<section class="filter-bar" aria-label="Marketplace filters">
+  <button class="chip active" type="button">All</button>
+  <button class="chip" type="button">Cooked</button>
+  <button class="chip" type="button">Bakery</button>
+  <button class="chip" type="button">Produce</button>
+  <button class="chip" type="button">Pickup today</button>
+</section>
+
+<section class="market-grid">
+  {% for item in listings %}
+  <article class="food-card">
+    {% if item.image_data %}
+    <img class="food-photo" src="{{ item.image_data }}" alt="{{ item.name }}">
+    {% else %}
+    <div class="food-visual {{ item.category|lower }}"></div>
+    {% endif %}
+    <div class="food-body">
+      <div class="card-top">
+        <span class="tag">{{ item.category }}</span>
+        <strong>{{ item.match }}% match</strong>
+      </div>
+      <h2>{{ item.name }}</h2>
+      <p>{{ item.source }}</p>
+      {% if requested_id == item.id %}
+      <div class="notice compact-notice">Pickup request sent. A donor and volunteer can coordinate delivery.</div>
+      {% endif %}
+      <dl>
+        <div><dt>Quantity</dt><dd>{{ item.quantity }}</dd></div>
+        <div><dt>Pickup</dt><dd>{{ item.location }}</dd></div>
+        <div><dt>Expires</dt><dd>{{ item.expires }}</dd></div>
+        <div><dt>Donor</dt><dd>{{ item.donor_name }}</dd></div>
+        <div><dt>Status</dt><dd>{{ item.status }}</dd></div>
+      </dl>
+      <form class="mini-form" action="{{ url_for('request_pickup', listing_id=item.id) }}" method="post">
+        <label>
+          Receiver / NGO name
+          <input name="receiver_name" value="Community Kitchen Trust" required>
+        </label>
+        <label>
+          Delivery location
+          <input name="receiver_location" value="Jubilee Hills, Hyderabad" required>
+        </label>
+        <button class="btn primary full" type="submit">Request pickup</button>
+      </form>
+    </div>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

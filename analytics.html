@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block title %}Analytics - FoodBridge AI{% endblock %}
+{% block content %}
+<section class="page-heading compact">
+  <span class="eyebrow">Impact intelligence</span>
+  <h1>Analytics</h1>
+  <p>Track rescued meals, partner activity, pickup reliability, and environmental impact.</p>
+</section>
+
+<section class="stats-grid">
+  {% for value, label, note in stats %}
+  <article class="stat-card">
+    <strong>{{ value }}</strong>
+    <span>{{ label }}</span>
+    <small>{{ note }}</small>
+  </article>
+  {% endfor %}
+</section>
+
+<section class="dashboard-grid">
+  <div class="panel wide">
+    <div class="panel-header">
+      <h2>Weekly rescued meals</h2>
+      <span class="tag">Live demo data</span>
+    </div>
+    <div class="bar-chart" aria-label="Weekly rescue chart">
+      {% for value in analytics.weekly %}
+      <div class="bar" style="--height: {{ value }}%">
+        <span>{{ value }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <aside class="panel impact-panel">
+    <h2>Carbon impact</h2>
+    <strong>{{ analytics.co2 }} kg</strong>
+    <p>Estimated CO2e avoided by routing surplus food to local receivers.</p>
+  </aside>
+</section>
+{% endblock %}
